@@ -1,5 +1,5 @@
 // controllers/authController.js
-const User = require('../../../models/userModel');
+const User = require('../../../express-MVC/Software-ll/models/userModel');
 
 exports.getLoginForm = (req, res) => {
     res.render('auth/login', { title: 'Iniciar Sesión' });
