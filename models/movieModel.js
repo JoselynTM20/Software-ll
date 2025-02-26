@@ -8,7 +8,8 @@ const movieSchema = new mongoose.Schema({
     synopsis: { type: String, required: true },
     duration: { type: Number, required: true },
     coverImage: { type: String, required: true },
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
+    rating: { type: Number, default: 0 }, // Asegúrate de que rating esté definido
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }], // Relación con las reseñas
 }, { timestamps: true });
 
 const Movie = mongoose.model('Movie', movieSchema);

@@ -19,14 +19,15 @@ exports.login = async (req, res) => {
             });
         }
 
+        // Guardar el usuario en la sesión
         req.session.user = {
             id: user._id,
             email: user.email,
             name: user.name,
-            role: user.role 
+            role: user.role
         };
 
-        console.log(req.session.user); 
+        console.log("Usuario autenticado:", req.session.user); // Verifica que la sesión se guardó correctamente
 
         res.redirect('/');
     } catch (error) {
@@ -37,7 +38,6 @@ exports.login = async (req, res) => {
         });
     }
 };
-
 
 exports.logout = (req, res) => {
     req.session.destroy((err) => {

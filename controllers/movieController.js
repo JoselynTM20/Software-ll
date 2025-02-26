@@ -1,12 +1,31 @@
+
+
+// Obtener todas las películas
 const Movie = require('../models/movieModel');
+const Favorite = require('../models/favoriteModel');
 
 // Obtener todas las películas
 exports.getAllMovies = async (req, res) => {
     try {
-        const movies = await Movie.find();
-        res.render('movies', { title: 'Películas', movies });
+        // Obtener todas las películas de la base de datos
+        const movies = await Movie.find().populate('reviews').exec(); // Popula las reseñas si es necesario
+
+        let userFavorites = [];
+        if (req.session.user) {
+            // Obtener las películas favoritas del usuario
+            userFavorites = await Favorite.find({ user: req.session.user.id });
+            userFavorites = userFavorites.map(fav => fav.movie.toString()); // Convertir a array de IDs
+        }
+
+        // Renderizar la vista con los datos
+        res.render('movies', { 
+            title: 'Películas', 
+            movies, 
+            userFavorites, 
+            user: req.session.user || null 
+        });
     } catch (error) {
-        console.error(error);
+        console.error("Error al obtener las películas:", error);
         res.status(500).send('Error al obtener las películas');
     }
 };
