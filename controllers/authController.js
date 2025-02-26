@@ -1,5 +1,6 @@
 // controllers/authController.js
-const User = require('../../../express-MVC/Software-ll/models/userModel');
+const User = require('../models/userModel');
+
 
 exports.getLoginForm = (req, res) => {
     res.render('auth/login', { title: 'Iniciar Sesión' });
@@ -11,7 +12,6 @@ exports.login = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         
-        // Validación simple de correo y contraseña
         if (!user || user.password !== password) {
             return res.render('auth/login', {
                 title: 'Iniciar Sesión',
@@ -23,8 +23,10 @@ exports.login = async (req, res) => {
             id: user._id,
             email: user.email,
             name: user.name,
-            role: user.role
+            role: user.role 
         };
+
+        console.log(req.session.user); 
 
         res.redirect('/');
     } catch (error) {

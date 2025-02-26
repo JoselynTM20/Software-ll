@@ -7,7 +7,10 @@ const methodOverride = require('method-override');
 const session = require('express-session');
 const userRouter = require('./routes/userRoutes');
 const authRouter = require('./routes/authRoutes');
-const { isAuthenticated } = require('./middleware/authMiddleWare');
+const movieRouter = require('./routes/movieRoutes'); // Nuevo: Rutas de películas
+const reviewRouter = require('./routes/reviewRoutes'); // Nuevo: Rutas de reseñas
+const dashboardRouter = require('./routes/dashboardRoutes'); // Nuevo: Rutas del dashboard
+const { isAuthenticated, isAdmin } = require('./middleware/authMiddleWare'); // Nuevo: Middleware de administrador
 
 dotenv.config();
 
@@ -58,6 +61,15 @@ app.get('/', (req, res) => {
 
 // Rutas protegidas (requieren autenticación)
 app.use('/users', isAuthenticated, userRouter);
+
+// Nuevo: Rutas de películas (protegidas y solo para administradores)
+app.use('/movies', isAuthenticated, isAdmin, movieRouter);
+
+// Nuevo: Rutas de reseñas (protegidas y solo para administradores)
+app.use('/reviews', isAuthenticated, isAdmin, reviewRouter);
+
+// Nuevo: Rutas del dashboard (protegidas y solo para administradores)
+app.use('/dashboard', isAuthenticated, isAdmin, dashboardRouter);
 
 // En lugar de usar una vista 404, simplemente redirigimos al login
 app.use((req, res) => {

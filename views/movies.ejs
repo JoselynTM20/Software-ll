@@ -1,0 +1,20 @@
+<h1>Películas</h1>
+<a href="/movies/add" class="btn btn-primary mb-3">Agregar Película</a>
+<ul class="list-group">
+    <% if (movies && movies.length > 0) { %>
+        <% movies.forEach(movie => { %>
+            <li class="list-group-item">
+                <h5><%= movie.title %></h5>
+                <p><strong>Director:</strong> <%= movie.director %></p>
+                <p><strong>Año:</strong> <%= movie.releaseYear %></p>
+                <p><strong>Género:</strong> <%= movie.genre %></p>
+                <a href="/movies/<%= movie._id %>/edit" class="btn btn-warning btn-sm">Editar</a>
+                <form action="/movies/<%= movie._id %>?_method=DELETE" method="POST" class="d-inline ms-2">
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+            </li>
+        <% }); %>
+    <% } else { %>
+        <li class="list-group-item">No hay películas disponibles.</li>
+    <% } %>
+</ul>
