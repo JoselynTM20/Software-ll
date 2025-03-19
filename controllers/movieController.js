@@ -1,46 +1,26 @@
-
-
-// Obtener todas las películas
+// controllers/movieController.js
 const Movie = require('../models/movieModel');
+const Review = require('../models/reviewModel');
 const Favorite = require('../models/favoriteModel');
 
-// Obtener todas las películas
 exports.getAllMovies = async (req, res) => {
     try {
-        // Obtener todas las películas de la base de datos
-        const movies = await Movie.find().populate('reviews').exec(); // Popula las reseñas si es necesario
-
-        let userFavorites = [];
-        if (req.session.user) {
-            // Obtener las películas favoritas del usuario
-            userFavorites = await Favorite.find({ user: req.session.user.id });
-            userFavorites = userFavorites.map(fav => fav.movie.toString()); // Convertir a array de IDs
-        }
-
-        // Renderizar la vista con los datos
-        res.render('movies', { 
-            title: 'Películas', 
-            movies, 
-            userFavorites, 
-            user: req.session.user || null 
-        });
+        const movies = await Movie.find();
+        res.render('movies/index', { title: 'Lista de Películas', movies, user: req.session.user || null });
     } catch (error) {
-        console.error("Error al obtener las películas:", error);
-        res.status(500).send('Error al obtener las películas');
+        console.error(error);
+        res.status(500).send('Error al obtener la lista de películas');
     }
 };
 
-// Mostrar formulario para agregar una película
 exports.getAddMovieForm = (req, res) => {
-    res.render('addMovie', { title: 'Agregar Película' });
+    res.render('movies/add', { title: 'Agregar Nueva Película', user: req.session.user || null });
 };
 
-// Agregar una nueva película
 exports.addMovie = async (req, res) => {
-    const { title, director, releaseYear, genre, synopsis, duration, coverImage } = req.body;
     try {
-        const newMovie = new Movie({ title, director, releaseYear, genre, synopsis, duration, coverImage });
-        await newMovie.save();
+        const movie = new Movie(req.body);
+        await movie.save();
         res.redirect('/movies');
     } catch (error) {
         console.error(error);
@@ -48,47 +28,58 @@ exports.addMovie = async (req, res) => {
     }
 };
 
-// Mostrar formulario para editar una película
-exports.getEditMovieForm = async (req, res) => {
+exports.getMovieDetails = async (req, res) => {
     const { id } = req.params;
+
     try {
-        const movie = await Movie.findById(id);
+        const movie = await Movie.findById(id).populate('reviews').exec();
         if (!movie) {
             return res.status(404).send('Película no encontrada');
         }
-        res.render('editMovie', { title: 'Editar Película', movie });
+
+        let isFavorite = false;
+        if (req.session.user) {
+            const favorite = await Favorite.findOne({ user: req.session.user.id, movie: id });
+            isFavorite = !!favorite;
+        }
+
+        res.render('movieDetails', { title: movie.title, movie, isFavorite, user: req.session.user || null });
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error al obtener la película para editar');
+        res.status(500).send('Error al obtener los detalles de la película');
     }
 };
 
-// Actualizar una película
-exports.updateMovie = async (req, res) => {
-    const { id } = req.params;
-    const { title, director, releaseYear, genre, synopsis, duration, coverImage } = req.body;
+exports.getEditMovieForm = async (req, res) => {
     try {
-        const updatedMovie = await Movie.findByIdAndUpdate(
-            id,
-            { title, director, releaseYear, genre, synopsis, duration, coverImage },
-            { new: true }
-        );
-        if (!updatedMovie) {
+        const movie = await Movie.findById(req.params.id);
+        if (!movie) {
             return res.status(404).send('Película no encontrada');
         }
-        res.redirect('/movies');
+        res.render('movies/edit', { title: 'Editar Película', movie, user: req.session.user || null });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener el formulario de edición');
+    }
+};
+
+exports.updateMovie = async (req, res) => {
+    try {
+        const movie = await Movie.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!movie) {
+            return res.status(404).send('Película no encontrada');
+        }
+        res.redirect(`/movies/${movie._id}`);
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al actualizar la película');
     }
 };
 
-// Eliminar una película
 exports.deleteMovie = async (req, res) => {
-    const { id } = req.params;
     try {
-        const deletedMovie = await Movie.findByIdAndDelete(id);
-        if (!deletedMovie) {
+        const movie = await Movie.findByIdAndDelete(req.params.id);
+        if (!movie) {
             return res.status(404).send('Película no encontrada');
         }
         res.redirect('/movies');

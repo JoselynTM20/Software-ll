@@ -10,7 +10,7 @@ const authRouter = require('./routes/authRoutes');
 const movieRouter = require('./routes/movieRoutes'); // Importa las rutas de películas
 const reviewRouter = require('./routes/reviewRoutes');
 const favoriteRouter = require('./routes/favoriteRoutes');
-const dashboardRouter = require('./routes/dashboardRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const { isAuthenticated, isAdmin } = require('./middleware/authMiddleWare');
 
 dotenv.config();
@@ -65,7 +65,7 @@ app.use('/users', isAuthenticated, userRouter);
 app.use('/movies', isAuthenticated, movieRouter); // Rutas de películas
 app.use('/reviews', isAuthenticated, reviewRouter);
 app.use('/favorites', isAuthenticated, favoriteRouter);
-app.use('/dashboard', isAuthenticated, isAdmin, dashboardRouter);
+app.use('/admin', isAuthenticated, isAdmin, adminRoutes);
 
 // En lugar de usar una vista 404, simplemente redirigimos al login
 app.use((req, res) => {

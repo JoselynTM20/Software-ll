@@ -1,3 +1,4 @@
+<!-- views/auth/register.ejs -->
 <%- include('../partials/header') %>
 
 <div class="container mt-5">
@@ -5,7 +6,7 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="text-center">Iniciar Sesión</h2>
+                    <h2 class="text-center">Registro</h2>
                 </div>
                 <div class="card-body">
                     <% if (typeof error !== 'undefined' && error) { %>
@@ -14,13 +15,12 @@
                         </div>
                     <% } %>
 
-                    <% if (typeof success !== 'undefined' && success) { %>
-                        <div class="alert alert-success" role="alert">
-                            <%= success %>
+                    <form action="/auth/register" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
                         </div>
-                    <% } %>
 
-                    <form action="/auth/login" method="POST">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" name="email" required>
@@ -31,13 +31,18 @@
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="age" class="form-label">Edad</label>
+                            <input type="number" class="form-control" id="age" name="age" required>
+                        </div>
+
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                            <button type="submit" class="btn btn-primary">Registrarse</button>
                         </div>
                     </form>
 
                     <div class="text-center mt-3">
-                        <p>¿No tienes una cuenta? <a href="/auth/register">Regístrate</a></p>
+                        <p>¿Ya tienes una cuenta? <a href="/auth/login">Inicia sesión</a></p>
                     </div>
                 </div>
             </div>

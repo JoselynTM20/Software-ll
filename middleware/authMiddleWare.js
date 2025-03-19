@@ -1,7 +1,6 @@
 // Middleware para verificar si el usuario está autenticado
 const isAuthenticated = (req, res, next) => {
-    console.log("Verificando autenticación...");
-    console.log("Datos de la sesión:", req.session.user);
+
 
     if (req.session.user) {
         next(); // El usuario está autenticado, continuar

@@ -1,4 +1,6 @@
 const User = require('../models/userModel');
+const Favorite = require('../models/favoriteModel');
+const Movie = require('../models/movieModel');
 
 // Obtener todos los usuarios
 exports.getAllUsers = async (req, res) => {
@@ -13,14 +15,34 @@ exports.getAllUsers = async (req, res) => {
 
 // Crear un nuevo usuario
 exports.createUser = async (req, res) => {
-    const { name, email, age, role } = req.body;
+    const { name, email, password, age, role } = req.body;
     try {
-        const newUser = new User({ name, email, age, role });
+        // Validar que todos los campos requeridos estén presentes
+        if (!name || !email || !password || !age) {
+            return res.render('users/create', {
+                title: 'Crear Usuario',
+                error: 'Todos los campos son obligatorios'
+            });
+        }
+
+        // Verificar si el email ya existe
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.render('users/create', {
+                title: 'Crear Usuario',
+                error: 'El email ya está registrado'
+            });
+        }
+
+        const newUser = new User({ name, email, password, age, role });
         await newUser.save();
-        res.redirect('/users');
+        res.redirect('/admin/users');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error al crear el usuario');
+        res.render('users/create', {
+            title: 'Crear Usuario',
+            error: 'Error al crear el usuario'
+        });
     }
 };
 
@@ -42,20 +64,33 @@ exports.getEditUser = async (req, res) => {
 // Actualizar un usuario
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
-    const { name, email, age, role } = req.body;
+    const { name, email, password, age, role } = req.body;
     try {
+        // Validar que todos los campos requeridos estén presentes
+        if (!name || !email || !password || !age) {
+            return res.render('users/edit', {
+                title: 'Editar Usuario',
+                user: { _id: id, name, email, age, role },
+                error: 'Todos los campos son obligatorios'
+            });
+        }
+
         const updatedUser = await User.findByIdAndUpdate(
             id, 
-            { name, email, age, role }, 
+            { name, email, password, age, role }, 
             { new: true }
         );
         if (!updatedUser) {
             return res.status(404).send('Usuario no encontrado');
         }
-        res.redirect('/users');
+        res.redirect('/admin/users');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error al actualizar el usuario');
+        res.render('users/edit', {
+            title: 'Editar Usuario',
+            user: { _id: id, name, email, age, role },
+            error: 'Error al actualizar el usuario'
+        });
     }
 };
 
@@ -71,5 +106,18 @@ exports.deleteUser = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al eliminar el usuario');
+    }
+};
+
+
+exports.getUserFavorites = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const favorites = await Favorite.find({ user: id }).populate('movie').exec();
+        res.render('users/favorites', { title: 'Mis Favoritos', favorites, user: req.session.user || null });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener las películas favoritas');
     }
 };

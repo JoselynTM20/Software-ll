@@ -3,13 +3,16 @@ const router = express.Router();
 const favoriteController = require('../controllers/favoriteController');
 const { isAuthenticated } = require('../middleware/authMiddleWare');
 
-// Proteger todas las rutas
+// Todas las rutas requieren autenticación
 router.use(isAuthenticated);
 
-// Agregar una película a favoritos
+// Ver lista de favoritos
+router.get('/', favoriteController.getFavorites);
+
+// Agregar a favoritos
 router.post('/', favoriteController.addFavorite);
 
-// Eliminar una película de favoritos
-router.delete('/:favoriteId', favoriteController.removeFavorite);
+// Eliminar de favoritos
+router.delete('/:id', favoriteController.removeFavorite);
 
 module.exports = router;
