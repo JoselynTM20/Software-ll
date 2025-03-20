@@ -7,11 +7,12 @@ const methodOverride = require('method-override');
 const session = require('express-session');
 const userRouter = require('./routes/userRoutes');
 const authRouter = require('./routes/authRoutes');
-const movieRouter = require('./routes/movieRoutes'); // Importa las rutas de películas
+const movieRouter = require('./routes/movieRoutes'); 
 const reviewRouter = require('./routes/reviewRoutes');
 const favoriteRouter = require('./routes/favoriteRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const { isAuthenticated, isAdmin } = require('./middleware/authMiddleWare');
+const apiUserRoutes = require('./routes/api/userRoutes');
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayout);
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // Agregar middleware para procesar JSON
 app.use(express.static(path.join(__dirname, 'css')));
 app.use(methodOverride('_method'));
 
@@ -50,6 +52,9 @@ mongoose.connect(process.env.MONGOD_URI)
 
 // Rutas públicas (no requieren autenticación)
 app.use('/auth', authRouter);
+
+// Rutas de API (requieren autenticación)
+app.use('/api/users', isAuthenticated, apiUserRoutes);
 
 // Redirigir la ruta principal al login si no está autenticado
 app.get('/', (req, res) => {
@@ -62,13 +67,18 @@ app.get('/', (req, res) => {
 
 // Rutas protegidas (requieren autenticación)
 app.use('/users', isAuthenticated, userRouter);
-app.use('/movies', isAuthenticated, movieRouter); // Rutas de películas
+app.use('/movies', isAuthenticated, movieRouter); 
 app.use('/reviews', isAuthenticated, reviewRouter);
 app.use('/favorites', isAuthenticated, favoriteRouter);
 app.use('/admin', isAuthenticated, isAdmin, adminRoutes);
 
-// En lugar de usar una vista 404, simplemente redirigimos al login
+// Middleware para manejar rutas no encontradas
 app.use((req, res) => {
+    // Si la ruta comienza con /api, devolver error 404 en formato JSON
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ message: 'Ruta no encontrada' });
+    }
+    // Para otras rutas, redirigir al login
     res.redirect('/auth/login');
 });
 
