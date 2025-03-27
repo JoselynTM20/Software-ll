@@ -1,17 +1,11 @@
 <%- include('../partials/header') %>
 
 <div class="container mt-4">
-    <h1 class="mb-4">Editar Usuario</h1>
-
-    <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-danger" role="alert">
-            <%= error %>
-        </div>
-    <% } %>
+    <h1 class="mb-4">Editar Perfil</h1>
 
     <div class="card">
         <div class="card-body">
-            <form action="/admin/users/<%= user._id %>?_method=PUT" method="POST">
+            <form id="profileForm">
                 <div class="mb-3">
                     <label for="name" class="form-label">Nombre</label>
                     <input type="text" class="form-control" id="name" name="name" value="<%= user.name %>" required>
@@ -23,30 +17,40 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="password" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                </div>
-
-                <div class="mb-3">
                     <label for="age" class="form-label">Edad</label>
                     <input type="number" class="form-control" id="age" name="age" value="<%= user.age %>" required>
                 </div>
 
-                <div class="mb-3">
-                    <label for="role" class="form-label">Rol</label>
-                    <select class="form-select" id="role" name="role">
-                        <option value="usuario" <%= user.role === 'usuario' ? 'selected' : '' %>>Usuario</option>
-                        <option value="administrador" <%= user.role === 'administrador' ? 'selected' : '' %>>Administrador</option>
-                    </select>
-                </div>
-
                 <div class="d-flex justify-content-between">
-                    <a href="/admin/users" class="btn btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
+                    <a href="/" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Actualizar Perfil</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const profileForm = document.getElementById('profileForm');
+
+    profileForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            age: document.getElementById('age').value
+        };
+
+        try {
+            await userAPI.updateProfile(formData);
+            alert('Perfil actualizado correctamente');
+        } catch (error) {
+            alert('Error al actualizar el perfil');
+        }
+    });
+});
+</script>
 
 <%- include('../partials/footer') %> 

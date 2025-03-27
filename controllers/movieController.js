@@ -14,17 +14,42 @@ exports.getAllMovies = async (req, res) => {
 };
 
 exports.getAddMovieForm = (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'administrador') {
+        return res.redirect('/');
+    }
     res.render('movies/add', { title: 'Agregar Nueva Película', user: req.session.user || null });
 };
 
 exports.addMovie = async (req, res) => {
     try {
+        if (!req.session.user || req.session.user.role !== 'administrador') {
+            return res.redirect('/');
+        }
+
+        // Validar que todos los campos requeridos estén presentes
+        const requiredFields = ['title', 'director', 'releaseYear', 'genre', 'synopsis', 'duration', 'coverImage'];
+        const missingFields = requiredFields.filter(field => !req.body[field]);
+        
+        if (missingFields.length > 0) {
+            return res.render('movies/add', {
+                title: 'Agregar Nueva Película',
+                user: req.session.user,
+                error: `Faltan campos requeridos: ${missingFields.join(', ')}`,
+                formData: req.body // Mantener los datos del formulario
+            });
+        }
+
         const movie = new Movie(req.body);
         await movie.save();
         res.redirect('/movies');
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al agregar la película');
+        console.error('Error al agregar película:', error);
+        res.render('movies/add', {
+            title: 'Agregar Nueva Película',
+            user: req.session.user,
+            error: 'Error al agregar la película. Por favor, verifica los datos e intenta nuevamente.',
+            formData: req.body // Mantener los datos del formulario
+        });
     }
 };
 

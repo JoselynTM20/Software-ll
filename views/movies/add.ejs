@@ -4,37 +4,53 @@
 
     <div class="row">
         <div class="col-md-8 offset-md-2">
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-danger" role="alert">
+                    <%= error %>
+                </div>
+            <% } %>
+
             <div class="card">
                 <div class="card-body">
                     <form action="/movies/add" method="POST">
                         <div class="mb-3">
                             <label for="title" class="form-label">Título</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
+                            <input type="text" class="form-control" id="title" name="title" value="<%= typeof formData !== 'undefined' ? formData.title : '' %>" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="director" class="form-label">Director</label>
-                            <input type="text" class="form-control" id="director" name="director" required>
+                            <input type="text" class="form-control" id="director" name="director" value="<%= typeof formData !== 'undefined' ? formData.director : '' %>" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="releaseYear" class="form-label">Año de Lanzamiento</label>
-                            <input type="number" class="form-control" id="releaseYear" name="releaseYear" required>
+                            <input type="number" class="form-control" id="releaseYear" name="releaseYear" value="<%= typeof formData !== 'undefined' ? formData.releaseYear : '' %>" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="genre" class="form-label">Género</label>
-                            <input type="text" class="form-control" id="genre" name="genre" required>
+                            <input type="text" class="form-control" id="genre" name="genre" value="<%= typeof formData !== 'undefined' ? formData.genre : '' %>" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="rating" class="form-label">Puntuación (0-5)</label>
-                            <input type="number" class="form-control" id="rating" name="rating" min="0" max="5" step="0.1" required>
+                            <label for="synopsis" class="form-label">Sinopsis</label>
+                            <textarea class="form-control" id="synopsis" name="synopsis" rows="3" required><%= typeof formData !== 'undefined' ? formData.synopsis : '' %></textarea>
                         </div>
 
                         <div class="mb-3">
-                            <label for="description" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                            <label for="duration" class="form-label">Duración (minutos)</label>
+                            <input type="number" class="form-control" id="duration" name="duration" value="<%= typeof formData !== 'undefined' ? formData.duration : '' %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="coverImage" class="form-label">URL de la Imagen de Portada</label>
+                            <input type="text" class="form-control" id="coverImage" name="coverImage" value="<%= typeof formData !== 'undefined' ? formData.coverImage : '' %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="rating" class="form-label">Puntuación Inicial (0-5)</label>
+                            <input type="number" class="form-control" id="rating" name="rating" min="0" max="5" step="0.1" value="<%= typeof formData !== 'undefined' ? formData.rating : '0' %>" required>
                         </div>
 
                         <div class="d-flex justify-content-between">

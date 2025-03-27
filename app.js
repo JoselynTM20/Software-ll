@@ -52,6 +52,7 @@ mongoose.connect(process.env.MONGOD_URI)
 
 // Rutas públicas (no requieren autenticación)
 app.use('/auth', authRouter);
+app.use('/movies', movieRouter);
 
 // Rutas de API (requieren autenticación)
 app.use('/api/users', isAuthenticated, apiUserRoutes);
@@ -67,7 +68,6 @@ app.get('/', (req, res) => {
 
 // Rutas protegidas (requieren autenticación)
 app.use('/users', isAuthenticated, userRouter);
-app.use('/movies', isAuthenticated, movieRouter); 
 app.use('/reviews', isAuthenticated, reviewRouter);
 app.use('/favorites', isAuthenticated, favoriteRouter);
 app.use('/admin', isAuthenticated, isAdmin, adminRoutes);
